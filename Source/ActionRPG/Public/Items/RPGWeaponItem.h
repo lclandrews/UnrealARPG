@@ -5,17 +5,18 @@
 #include "Items/RPGItem.h"
 #include "RPGWeaponItem.generated.h"
 
-/** Native base class for weapons, should be blueprinted */
-UCLASS()
-class ACTIONRPG_API URPGWeaponItem : public URPGItem
+/** Native structure for weapons*/
+USTRUCT(BlueprintType)
+struct ACTIONRPG_API FRPGWeaponItemStruct : public FRPGItemStruct
 {
 	GENERATED_BODY()
 
 public:
 	/** Constructor */
-	URPGWeaponItem()
+	FRPGWeaponItemStruct()
+		: FRPGItemStruct()
 	{
-		ItemType = URPGAssetManager::WeaponItemType;
+		ItemType = ERPGItemType::Weapon;
 	}
 
 	/** Weapon actor to spawn */

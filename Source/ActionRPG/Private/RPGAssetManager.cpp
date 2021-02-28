@@ -32,17 +32,7 @@ void URPGAssetManager::StartInitialLoading()
 }
 
 
-URPGItem* URPGAssetManager::ForceLoadItem(const FPrimaryAssetId& PrimaryAssetId, bool bLogWarning)
+UObject* URPGAssetManager::ForceLoadItem(const FPrimaryAssetId& PrimaryAssetId, bool bLogWarning)
 {	
-	FSoftObjectPath ItemPath = GetPrimaryAssetPath(PrimaryAssetId);
-
-	// This does a synchronous load and may hitch
-	URPGItem* LoadedItem = Cast<URPGItem>(ItemPath.TryLoad());
-
-	if (bLogWarning && LoadedItem == nullptr)
-	{
-		UE_LOG(LogActionRPG, Warning, TEXT("Failed to load item for identifier %s!"), *PrimaryAssetId.ToString());
-	}
-
-	return LoadedItem;
+	return nullptr;
 }

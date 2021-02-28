@@ -41,6 +41,11 @@ bool URPGBlueprintLibrary::IsValidItemSlot(const FRPGItemSlot& ItemSlot)
 	return ItemSlot.IsValid();
 }
 
+bool URPGBlueprintLibrary::IsItemConsumable(const FRPGItemStruct& item)
+{
+	return item.MaxCount <= 0;
+}
+
 bool URPGBlueprintLibrary::DoesEffectContainerSpecHaveEffects(const FRPGGameplayEffectContainerSpec& ContainerSpec)
 {
 	return ContainerSpec.HasValidEffects();

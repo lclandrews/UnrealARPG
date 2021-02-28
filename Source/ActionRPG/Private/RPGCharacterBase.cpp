@@ -1,7 +1,11 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "RPGCharacterBase.h"
+
 #include "Items/RPGItem.h"
+#include "Items/RPGWeaponItem.h"
+#include "RPGGameInstanceBase.h"
+
 #include "AbilitySystemGlobals.h"
 #include "Abilities/RPGGameplayAbility.h"
 
@@ -87,7 +91,7 @@ void ARPGCharacterBase::RemoveStartupGameplayAbilities()
 	}
 }
 
-void ARPGCharacterBase::OnItemSlotChanged(FRPGItemSlot ItemSlot, URPGItem* Item)
+void ARPGCharacterBase::OnItemSlotChanged(FRPGItemSlot ItemSlot, FString ItemKey, ERPGItemType ItemType)
 {
 	RefreshSlottedGameplayAbilities();
 }
@@ -116,26 +120,35 @@ void ARPGCharacterBase::FillSlottedAbilitySpecs(TMap<FRPGItemSlot, FGameplayAbil
 	// Now potentially override with inventory
 	if (InventorySource)
 	{
-		const TMap<FRPGItemSlot, URPGItem*>& SlottedItemMap = InventorySource->GetSlottedItemMap();
+		const TMap<FRPGItemSlot, FString>& SlottedItemMap = InventorySource->GetSlottedItemMap();
 
-		for (const TPair<FRPGItemSlot, URPGItem*>& ItemPair : SlottedItemMap)
+		for (const TPair<FRPGItemSlot, FString>& ItemPair : SlottedItemMap)
 		{
-			URPGItem* SlottedItem = ItemPair.Value;
+			FString itemKey = ItemPair.Value;
+			FRPGItemSlot itemSlot = ItemPair.Key;
 
 			// Use the character level as default
 			int32 AbilityLevel = GetCharacterLevel();
 
-			if (SlottedItem && SlottedItem->ItemType.GetName() == FName(TEXT("Weapon")))
+			FRPGItemStruct itemData;
+			if (GetGameInstance() && GetGameInstance()->TryGetBaseItemData(itemKey, itemSlot.ItemType, itemData))
 			{
-				// Override the ability level to use the data from the slotted item
-				AbilityLevel = SlottedItem->AbilityLevel;
-			}
+				if (itemData.ItemType == ERPGItemType::Weapon)
+				{
+					FRPGWeaponItemStruct weapon;
 
-			if (SlottedItem && SlottedItem->GrantedAbility)
-			{
-				// This will override anything from default
-				SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(SlottedItem->GrantedAbility, AbilityLevel, INDEX_NONE, SlottedItem));
-			}
+					// Override the ability level to use the data from the slotted item
+					AbilityLevel = itemData.AbilityLevel;
+				}
+
+				if (itemData.GrantedAbility)
+				{
+					// This will override anything from default
+					// This needs to be reviewed to ensure that the ability owner beign set to game instance is acceptable
+					// May be instances of code trying to cast old data types from object owner :(
+					SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(itemData.GrantedAbility, AbilityLevel, INDEX_NONE, GetGameInstance()));
+				}
+			}			
 		}
 	}
 }
@@ -408,4 +421,14 @@ void ARPGCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const struct FG
 	{
 		OnMoveSpeedChanged(DeltaValue, EventTags);
 	}
+}
+
+URPGGameInstanceBase* ARPGCharacterBase::GetGameInstance()
+{
+	if (GameInstance == nullptr)
+	{
+		UWorld* World = GetWorld();
+		GameInstance = World ? World->GetGameInstance<URPGGameInstanceBase>() : nullptr;
+	}
+	return GameInstance;
 }

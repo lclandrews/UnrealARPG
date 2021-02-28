@@ -4,6 +4,7 @@
 
 #include "ActionRPG.h"
 #include "RPGTypes.h"
+#include "RPGItem.h"
 #include "Abilities/RPGAbilityTypes.h"
 #include "RPGBlueprintLibrary.generated.h"
 
@@ -40,6 +41,9 @@ public:
 	/** Validity check for ItemSlot */
 	UFUNCTION(BlueprintPure, Category = Inventory)
 	static bool IsValidItemSlot(const FRPGItemSlot& ItemSlot);
+
+	UFUNCTION(BlueprintCallable)
+	static bool IsItemConsumable(const FRPGItemStruct& item);
 
 	/** Checks if spec has any effects */
 	UFUNCTION(BlueprintPure, Category = Ability)

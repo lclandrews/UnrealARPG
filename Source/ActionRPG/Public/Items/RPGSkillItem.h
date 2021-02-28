@@ -5,16 +5,17 @@
 #include "Items/RPGItem.h"
 #include "RPGSkillItem.generated.h"
 
-/** Native base class for skills, should be blueprinted */
-UCLASS()
-class ACTIONRPG_API URPGSkillItem : public URPGItem
+/** Native structure for skills*/
+USTRUCT(BlueprintType)
+struct ACTIONRPG_API FRPGSkillItemStruct : public FRPGItemStruct
 {
 	GENERATED_BODY()
 
 public:
 	/** Constructor */
-	URPGSkillItem()
+	FRPGSkillItemStruct()
+		: FRPGItemStruct()
 	{
-		ItemType = URPGAssetManager::SkillItemType;
+		ItemType = ERPGItemType::Skill;
 	}
 };

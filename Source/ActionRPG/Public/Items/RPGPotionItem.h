@@ -5,16 +5,17 @@
 #include "Items/RPGItem.h"
 #include "RPGPotionItem.generated.h"
 
-/** Native base class for potions, should be blueprinted */
-UCLASS()
-class ACTIONRPG_API URPGPotionItem : public URPGItem
+/** Native structure for potions*/
+USTRUCT(BlueprintType)
+struct ACTIONRPG_API FRPGPotionItemStruct : public FRPGItemStruct
 {
 	GENERATED_BODY()
 
 public:
 	/** Constructor */
-	URPGPotionItem()
+	FRPGPotionItemStruct()
+		: FRPGItemStruct()			
 	{
-		ItemType = URPGAssetManager::PotionItemType;
+		ItemType = ERPGItemType::Potion;
 	}
 };

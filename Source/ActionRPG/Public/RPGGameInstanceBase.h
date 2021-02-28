@@ -3,6 +3,14 @@
 #pragma once
 
 #include "ActionRPG.h"
+
+#include "Items/RPGItem.h"
+
+#include "Items/RPGPotionItem.h"
+#include "Items/RPGSkillItem.h"
+#include "Items/RPGTokenItem.h"
+#include "Items/RPGWeaponItem.h"
+
 #include "Engine/GameInstance.h"
 #include "RPGGameInstanceBase.generated.h"
 
@@ -18,65 +26,71 @@ UCLASS()
 class ACTIONRPG_API URPGGameInstanceBase : public UGameInstance
 {
 	GENERATED_BODY()
-
 public:
 	// Constructor
-	URPGGameInstanceBase();
+	URPGGameInstanceBase();		
 
-	/** List of inventory items to add to new players */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
-	TMap<FPrimaryAssetId, FRPGItemData> DefaultInventory;
+	TMap<FString, FRPGPotionItemStruct> Potions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
+	TMap<FString, FRPGSkillItemStruct> Skills;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
+	TMap<FString, FRPGTokenItemStruct> Tokens;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
+	TMap<FString, FRPGWeaponItemStruct> Weapons;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
+	TMap<FString, FRPGItemData> DefaultInventoryItems;
 
 	/** Number of slots for each type of item */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
-	TMap<FPrimaryAssetType, int32> ItemSlotsPerType;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, DisplayName = "Item Slots Per Type")
+	TMap<ERPGItemType, int32> SlotsPerItemType;
 
-	/** The slot name used for saving */
-	UPROPERTY(BlueprintReadWrite, Category = Save)
-	FString SaveSlot;
-
-	/** The platform-specific user index */
-	UPROPERTY(BlueprintReadWrite, Category = Save)
-	int32 SaveUserIndex;
-
-	/**
-	 * Adds the default inventory to the inventory array
-	 * @param InventoryArray Inventory to modify
-	 * @param RemoveExtra If true, remove anything other than default inventory
-	 */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	void AddDefaultInventory(URPGSaveGame* SaveGame, bool bRemoveExtra = false);
+	bool ItemExists(FString ItemKey, ERPGItemType ItemType) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool TryGetPotion(FString PotionKey, FRPGPotionItemStruct& outPotion) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	FRPGPotionItemStruct GetPotion(FString PotionKey) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool TryGetSkill(FString SkillKey, FRPGSkillItemStruct& outSkill) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	FRPGSkillItemStruct GetSkill(FString SkillKey) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool TryGetToken(FString TokenKey, FRPGTokenItemStruct& outToken) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	FRPGTokenItemStruct GetToken(FString TokenKey) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool TryGetWeapon(FString WeaponKey, FRPGWeaponItemStruct& outWeapon) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	FRPGWeaponItemStruct GetWeapon(FString WeaponKey) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool TryGetBaseItemData(FString ItemKey, ERPGItemType ItemType, FRPGItemStruct& outItem) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	FRPGItemStruct GetBaseItemData(FString ItemKey, ERPGItemType ItemType) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool FindItem(FString ItemKey, ERPGItemType& OutItemType, FRPGItemStruct& OutItemData) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	void GetItemsBaseInfo(ERPGItemType ItemType, TMap<FString, FRPGItemStruct>& OutItems) const;
 
 	/** Returns true if this is a valid inventory slot */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	bool IsValidItemSlot(FRPGItemSlot ItemSlot) const;
+	bool IsValidItemSlot(FRPGItemSlot ItemSlot) const;	
 
-	/** Returns the current save game, so it can be used to initialize state. Changes are not written until WriteSaveGame is called */
-	UFUNCTION(BlueprintCallable, Category = Save)
-	URPGSaveGame* GetCurrentSaveGame();
-
-	/** Sets rather save/load is enabled. If disabled it will always count as a new character */
-	UFUNCTION(BlueprintCallable, Category = Save)
-	void SetSavingEnabled(bool bEnabled);
-
-	/** Loads a save game. If it fails, it will create a new one for you. Returns true if it loaded, false if it created one */
-	UFUNCTION(BlueprintCallable, Category = Save)
-	bool LoadOrCreateSaveGame();
-
-	/** Writes the current save game object to disk */
-	UFUNCTION(BlueprintCallable, Category = Save)
-	bool WriteSaveGame();
-
-	/** Resets the current save game to it's default. This will erase player data! This won't save to disk until the next WriteSaveGame */
-	UFUNCTION(BlueprintCallable, Category = Save)
-	void ResetSaveGame();
-
-protected:
-	/** The current save game object */
-	UPROPERTY()
-	URPGSaveGame* CurrentSaveGame;
-
-	/** Rather it will attempt to actually save to disk */
-	UPROPERTY()
-	bool bSavingEnabled;
+	virtual void Init() override;
 };

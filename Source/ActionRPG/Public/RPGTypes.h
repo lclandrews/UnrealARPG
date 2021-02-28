@@ -8,10 +8,19 @@
 // It's also a good place to put things like data table row structs
 // ----------------------------------------------------------------------------------------------------------------
 
-#include "UObject/PrimaryAssetId.h"
 #include "RPGTypes.generated.h"
 
 class URPGItem;
+
+UENUM(BlueprintType)
+enum class ERPGItemType : uint8
+{
+	Potion = 0,
+	Skill = 1,
+	Token = 2,
+	Weapon = 3,
+	Undefined = 4,
+};
 
 /** Struct representing a slot for an item, shown in the UI */
 USTRUCT(BlueprintType)
@@ -24,14 +33,14 @@ struct ACTIONRPG_API FRPGItemSlot
 		: SlotNumber(-1)
 	{}
 
-	FRPGItemSlot(const FPrimaryAssetType& InItemType, int32 InSlotNumber)
+	FRPGItemSlot(const ERPGItemType& InItemType, int32 InSlotNumber)
 		: ItemType(InItemType)
 		, SlotNumber(InSlotNumber)
 	{}
 
 	/** The type of items that can go in this slot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	FPrimaryAssetType ItemType;
+	ERPGItemType ItemType;
 
 	/** The number of this slot, 0 indexed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
@@ -60,7 +69,7 @@ struct ACTIONRPG_API FRPGItemSlot
 	/** Returns true if slot is valid */
 	bool IsValid() const
 	{
-		return ItemType.IsValid() && SlotNumber >= 0;
+		return ItemType != ERPGItemType::Undefined && SlotNumber >= 0;
 	}
 };
 
@@ -73,14 +82,20 @@ struct ACTIONRPG_API FRPGItemData
 
 	/** Constructor, default to count/level 1 so declaring them in blueprints gives you the expected behavior */
 	FRPGItemData()
-		: ItemCount(1)
+		: ItemType(ERPGItemType::Undefined)
+		, ItemCount(1)
 		, ItemLevel(1)
 	{}
 
-	FRPGItemData(int32 InItemCount, int32 InItemLevel)
-		: ItemCount(InItemCount)
+	FRPGItemData(int32 InItemCount, int32 InItemLevel, ERPGItemType ItemType)
+		: ItemType(ItemType)
+		, ItemCount(InItemCount)
 		, ItemLevel(InItemLevel)
 	{}
+
+	/** The type of item in the inventory */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	ERPGItemType ItemType;
 
 	/** The number of instances of this item in the inventory, can never be below 1 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
@@ -93,7 +108,7 @@ struct ACTIONRPG_API FRPGItemData
 	/** Equality operators */
 	bool operator==(const FRPGItemData& Other) const
 	{
-		return ItemCount == Other.ItemCount && ItemLevel == Other.ItemLevel;
+		return ItemCount == Other.ItemCount && ItemLevel == Other.ItemLevel && ItemType == Other.ItemType;
 	}
 	bool operator!=(const FRPGItemData& Other) const
 	{
@@ -103,7 +118,7 @@ struct ACTIONRPG_API FRPGItemData
 	/** Returns true if count is greater than 0 */
 	bool IsValid() const
 	{
-		return ItemCount > 0;
+		return ItemCount > 0 && ItemType != ERPGItemType::Undefined;
 	}
 
 	/** Append an item data, this adds the count and overrides everything else */
@@ -125,12 +140,12 @@ struct ACTIONRPG_API FRPGItemData
 };
 
 /** Delegate called when an inventory item changes */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, bool, bAdded, URPGItem*, Item);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, bool, URPGItem*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnInventoryItemChanged, bool, bAdded, FString, ItemKey, ERPGItemType, ItemType);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnInventoryItemChangedNative, bool, FString, ERPGItemType);
 
 /** Delegate called when the contents of an inventory slot change */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FRPGItemSlot, ItemSlot, URPGItem*, Item);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChangedNative, FRPGItemSlot, URPGItem*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSlottedItemChanged, FRPGItemSlot, ItemSlot, FString, ItemKey, ERPGItemType, ItemType);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnSlottedItemChangedNative, FRPGItemSlot, FString, ERPGItemType);
 
 /** Delegate called when the entire inventory has been loaded, all items may have been replaced */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryLoaded);

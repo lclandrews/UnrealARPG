@@ -3,22 +3,21 @@
 #pragma once
 
 #include "ActionRPG.h"
-#include "Engine/DataAsset.h"
 #include "Styling/SlateBrush.h"
-#include "RPGAssetManager.h"
+#include "RPGTypes.h"
 #include "RPGItem.generated.h"
 
 class URPGGameplayAbility;
 
 /** Base class for all items, do not blueprint directly */
-UCLASS(Abstract, BlueprintType)
-class ACTIONRPG_API URPGItem : public UPrimaryDataAsset
+USTRUCT(BlueprintType)
+struct ACTIONRPG_API FRPGItemStruct
 {
 	GENERATED_BODY()
 
 public:
 	/** Constructor */
-	URPGItem()
+	FRPGItemStruct()
 		: Price(0)
 		, MaxCount(1)
 		, MaxLevel(1)
@@ -27,7 +26,7 @@ public:
 
 	/** Type of this item, set in native parent class */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
-	FPrimaryAssetType ItemType;
+	ERPGItemType ItemType;
 
 	/** User-visible short name */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
@@ -49,10 +48,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
 	int32 MaxCount;
 
-	/** Returns if the item is consumable (MaxCount <= 0)*/
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Max)
-	bool IsConsumable() const;
-
 	/** Maximum level this item can be, <= 0 means infinite */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
 	int32 MaxLevel;
@@ -64,13 +59,4 @@ public:
 	/** Ability level this item grants. <= 0 means the character level */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	int32 AbilityLevel;
-
-	/** Returns the logical name, equivalent to the primary asset id */
-	UFUNCTION(BlueprintCallable, Category = Item)
-	FString GetIdentifierString() const;
-
-	/** Overridden to use saved type */
-	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
 };
-
-

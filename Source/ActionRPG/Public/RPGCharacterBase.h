@@ -11,6 +11,7 @@
 #include "Abilities/RPGAttributeSet.h"
 #include "RPGCharacterBase.generated.h"
 
+class URPGGameInstanceBase;
 class URPGGameplayAbility;
 class UGameplayEffect;
 
@@ -169,7 +170,7 @@ protected:
 	void OnMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 	/** Called when slotted items change, bound to delegate on interface */
-	void OnItemSlotChanged(FRPGItemSlot ItemSlot, URPGItem* Item);
+	void OnItemSlotChanged(FRPGItemSlot ItemSlot, FString ItemKey, ERPGItemType ItemType);
 	void RefreshSlottedGameplayAbilities();
 
 	/** Apply the startup gameplay abilities and effects */
@@ -193,6 +194,12 @@ protected:
 	virtual void HandleManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
+	UFUNCTION(BlueprintCallable, Category = Game)
+	URPGGameInstanceBase* GetGameInstance();
+
 	// Friended to allow access to handle functions above
 	friend URPGAttributeSet;
+
+private:
+	URPGGameInstanceBase* GameInstance;
 };

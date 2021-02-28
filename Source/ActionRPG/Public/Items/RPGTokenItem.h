@@ -5,17 +5,18 @@
 #include "Items/RPGItem.h"
 #include "RPGTokenItem.generated.h"
 
-/** Native base class for tokens/currency, should be blueprinted */
-UCLASS()
-class ACTIONRPG_API URPGTokenItem : public URPGItem
+/** Native structure for tokens*/
+USTRUCT(BlueprintType)
+struct ACTIONRPG_API FRPGTokenItemStruct : public FRPGItemStruct
 {
 	GENERATED_BODY()
 
 public:
 	/** Constructor */
-	URPGTokenItem()
+	FRPGTokenItemStruct()
+		: FRPGItemStruct()
 	{
-		ItemType = URPGAssetManager::TokenItemType;
+		ItemType = ERPGItemType::Token;
 		MaxCount = 0; // Infinite
 	}
 };

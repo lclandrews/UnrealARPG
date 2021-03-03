@@ -9,6 +9,13 @@
 #include "AbilitySystemGlobals.h"
 #include "Abilities/RPGGameplayAbility.h"
 
+// LA -
+// Prevents code optimisation which is useful for stepping through as it means
+// each line accurately matches where we are in execution
+// Although it MUST be turned back on at the end of the file
+// See: https://docs.microsoft.com/en-us/cpp/preprocessor/optimize?view=msvc-160
+#pragma optimize("", off)
+
 ARPGCharacterBase::ARPGCharacterBase()
 {
 	// Create ability system component, and set it to be explicitly replicated
@@ -432,3 +439,5 @@ URPGGameInstanceBase* ARPGCharacterBase::GetGameInstance()
 	}
 	return GameInstance;
 }
+
+#pragma optimize("", on)

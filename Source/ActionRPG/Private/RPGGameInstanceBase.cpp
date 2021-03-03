@@ -4,6 +4,13 @@
 #include "Items/RPGItem.h"
 #include "Kismet/GameplayStatics.h"
 
+// LA -
+// Prevents code optimisation which is useful for stepping through as it means
+// each line accurately matches where we are in execution
+// Although it MUST be turned back on at the end of the file
+// See: https://docs.microsoft.com/en-us/cpp/preprocessor/optimize?view=msvc-160
+#pragma optimize("", off)
+
 URPGGameInstanceBase::URPGGameInstanceBase()
 {}
 
@@ -233,6 +240,7 @@ void URPGGameInstanceBase::GetItemsBaseInfo(ERPGItemType ItemType, TMap<FString,
 		{
 			OutItems.Add(pair.Key, (FRPGItemStruct)pair.Value);
 		}
+		break;
 	}
 	case ERPGItemType::Skill:
 	{
@@ -240,6 +248,7 @@ void URPGGameInstanceBase::GetItemsBaseInfo(ERPGItemType ItemType, TMap<FString,
 		{
 			OutItems.Add(pair.Key, (FRPGItemStruct)pair.Value);
 		}
+		break;
 	}
 	case ERPGItemType::Token:
 	{
@@ -247,6 +256,7 @@ void URPGGameInstanceBase::GetItemsBaseInfo(ERPGItemType ItemType, TMap<FString,
 		{
 			OutItems.Add(pair.Key, (FRPGItemStruct)pair.Value);
 		}
+		break;
 	}
 	case ERPGItemType::Weapon:
 	{
@@ -254,6 +264,7 @@ void URPGGameInstanceBase::GetItemsBaseInfo(ERPGItemType ItemType, TMap<FString,
 		{
 			OutItems.Add(pair.Key, (FRPGItemStruct)pair.Value);
 		}
+		break;
 	}
 	case ERPGItemType::Undefined:
 	{
@@ -273,6 +284,7 @@ void URPGGameInstanceBase::GetItemsBaseInfo(ERPGItemType ItemType, TMap<FString,
 		{
 			OutItems.Add(pair.Key, (FRPGItemStruct)pair.Value);
 		}
+		break;
 	}
 	}
 }
@@ -295,3 +307,5 @@ void URPGGameInstanceBase::Init()
 {
 	Super::Init();
 }
+
+#pragma optimize("", on)

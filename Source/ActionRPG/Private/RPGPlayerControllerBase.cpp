@@ -4,10 +4,17 @@
 #include "RPGCharacterBase.h"
 #include "RPGGameInstanceBase.h"
 
+// LA -
+// Prevents code optimisation which is useful for stepping through as it means
+// each line accurately matches where we are in execution
+// Although it MUST be turned back on at the end of the file
+// See: https://docs.microsoft.com/en-us/cpp/preprocessor/optimize?view=msvc-160
+#pragma optimize("", off)
+
 bool ARPGPlayerControllerBase::AddInventoryItem(FString NewItemKey, ERPGItemType ItemType, int32 ItemCount, int32 ItemLevel, bool bAutoSlot)
 {
 	bool bChanged = false;
-	if (!NewItemKey.IsEmpty() || ItemType == ERPGItemType::Undefined)
+	if (NewItemKey.IsEmpty() || ItemType == ERPGItemType::Undefined)
 	{
 		UE_LOG(LogActionRPG, Warning, TEXT("AddInventoryItem: Failed trying to add null item!"));
 		return false;
@@ -58,7 +65,7 @@ bool ARPGPlayerControllerBase::AddInventoryItem(FString NewItemKey, ERPGItemType
 
 bool ARPGPlayerControllerBase::RemoveInventoryItem(FString RemovedItemKey, int32 RemoveCount)
 {
-	if (!RemovedItemKey.IsEmpty())
+	if (RemovedItemKey.IsEmpty())
 	{
 		UE_LOG(LogActionRPG, Warning, TEXT("RemoveInventoryItem: Failed trying to remove null item!"));
 		return false;
@@ -311,3 +318,5 @@ void ARPGPlayerControllerBase::BeginPlay()
 
 	Super::BeginPlay();
 }
+
+#pragma optimize("", on)

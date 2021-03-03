@@ -136,6 +136,7 @@ struct ACTIONRPG_API FRPGItemData
 
 		ItemCount = FMath::Clamp(ItemCount + Other.ItemCount, 1, MaxCount);
 		ItemLevel = FMath::Clamp(Other.ItemLevel, 1, MaxLevel);
+		ItemType = Other.ItemType;
 	}
 };
 
